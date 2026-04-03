@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login — NEXUS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@300;400;500;600;700&family=Orbitron:wght@400;600;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../styles.css">
+<link rel="stylesheet" href="./login.css">
+
+</head>
+<body>
+<div class="grid-bg"></div>
+<div class="particles" id="particles"></div>
+<nav>
+  <a class="nav-logo" href="./LOGIN.html"><span class="bracket">[</span>NEXUS<span class="bracket">]</span></a>
+  <div class="nav-status"><div class="status-dot"></div>SECURE_CONN :: TLS_1.3</div>
+  <div class="nav-links">
+    <a class="nav-btn active" href="./LOGIN.html">Login</a>
+    <a class="nav-btn" href="../REGISTER/REGISTER.html">Register</a>
+    <a class="nav-btn" href="../DOC/documentation.html">Docs</a>
+  </div>
+</nav>
+<main class="page-shell auth-layout">
+  <div class="auth-container">
+    <div class="auth-panel">
+      <div class="terminal-line">&gt; initializing_secure_channel... READY</div>
+      <div class="auth-badge">Authentication Portal</div>
+      <h1 class="auth-title">SIGN IN</h1>
+      <p class="auth-subtitle">Accès réservé aux opérateurs autorisés</p>
+      <div class="alert" id="login-alert">ACCESS DENIED — Identifiants incorrects</div>
+      <div class="field-group">
+        <label class="field-label" for="login-email">Identifiant</label>
+        <div class="field-wrapper">
+          <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <input class="field-input" id="login-email" type="text" placeholder="user@nexus.sec" autocomplete="off">
+        </div>
+      </div>
+      <div class="field-group">
+        <label class="field-label" for="login-password">Passphrase</label>
+        <div class="field-wrapper">
+          <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <input class="field-input" id="login-password" type="password" placeholder="••••••••••••">
+        </div>
+      </div>
+      <button class="btn-primary" type="button">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+        AUTHENTICATE
+      </button>
+      <div class="auth-divider"><span>ou</span></div>
+      <div class="auth-link-row">Pas encore de compte ? &nbsp;<a class="auth-link" href="../REGISTER/REGISTER.html">Créer un accès →</a></div>
+    </div>
+  </div>
+</main>
+<script src="./login.js" defer></script>
+</body>
+</html>

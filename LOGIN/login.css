@@ -1,0 +1,23 @@
+/* Login page specific styles (matches register styling) */
+.page-shell.auth-layout{min-height:100vh;display:flex;align-items:center;justify-content:center;padding-top:88px}
+.auth-container{width:100%;max-width:980px;padding:1rem;display:flex;justify-content:center}
+.auth-panel{width:100%;max-width:440px;background:var(--bg-panel);border:1px solid var(--border-dim);padding:2rem;border-radius:12px;box-shadow:var(--shadow-neon);backdrop-filter:blur(12px)}
+.terminal-line{font-family:'Share Tech Mono',monospace;font-size:.78rem;color:var(--neon-cyan);background:rgba(0,0,0,.12);padding:.35rem .6rem;border-radius:6px;margin-bottom:.85rem;display:inline-block}
+.auth-badge{font-family:'Share Tech Mono',monospace;font-size:.65rem;letter-spacing:.18em;text-transform:uppercase;color:var(--neon-gold);margin-bottom:.4rem;display:inline-block}
+.auth-title{font-family:'Orbitron',monospace;font-size:1.6rem;margin:0 0 .25rem;color:var(--text-primary)}
+.auth-subtitle{color:var(--text-secondary);margin-bottom:1rem;font-size:.95rem}
+.alert{display:none;margin:.5rem 0 1rem;padding:.75rem 1rem;border-radius:8px;background:rgba(255,45,85,.04);color:var(--neon-red);border:1px solid rgba(255,45,85,.12);font-family:'Share Tech Mono',monospace;font-size:.9rem}
+.alert.show{display:block}
+.alert.success{background:rgba(0,255,136,.06);color:var(--neon-green);border-color:rgba(0,255,136,.12)}
+.field-group{margin-bottom:1rem}
+.field-label{display:block;margin-bottom:.35rem;font-family:'Share Tech Mono',monospace;font-size:.75rem;color:var(--text-muted);letter-spacing:.12em;text-transform:uppercase}
+.field-wrapper{display:flex;align-items:center;gap:.75rem;background:rgba(0,0,0,.06);border:1px solid rgba(0,212,255,.03);padding:.6rem .8rem;border-radius:8px}
+.field-icon{width:20px;height:20px;color:var(--neon-cyan);flex-shrink:0}
+.field-input{flex:1;background:transparent;border:0;outline:none;color:var(--text-primary);font-size:1rem;padding:.25rem}
+.btn-primary{display:inline-flex;align-items:center;gap:.6rem;justify-content:center;width:100%;padding:.85rem 1rem;background:linear-gradient(90deg,var(--neon-cyan),var(--neon-blue));color:#00121a;font-weight:700;border-radius:10px;border:none;cursor:pointer;box-shadow:var(--shadow-strong);text-transform:uppercase;letter-spacing:.12em}
+.btn-primary svg{stroke:rgba(0,0,0,.5)}
+.auth-divider{text-align:center;margin:1rem 0;color:var(--text-muted);font-size:.9rem}
+.auth-divider span{background:transparent;padding:.2rem .6rem;color:var(--text-muted)}
+.auth-link-row{text-align:center;color:var(--text-secondary);font-size:.95rem}
+.auth-link{color:var(--neon-cyan);text-decoration:none;font-weight:600}
+@media (max-width:640px){.auth-panel{margin:0 1rem;padding:1.25rem}.btn-primary{padding:.7rem}}
