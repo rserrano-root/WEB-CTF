@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify, session, redirect, url_for
 from flask_cors import CORS
 import mysql.connector
+from mysql.connector import errorcode
 import bcrypt
 import os
 from functools import wraps
@@ -21,6 +22,53 @@ DB_CONFIG = {
 def get_db():
     """Retourne une connexion à la base de données."""
     return mysql.connector.connect(**DB_CONFIG)
+
+
+def ensure_database(schema_path="ctfeur.sql"):
+    """
+    Ensure the configured database exists. If missing, create it and
+    execute statements from the provided SQL dump (`schema_path`). This
+    lets the app work with the repository's `ctfeur.sql` when the DB is
+    not yet created.
+    """
+    dbname = DB_CONFIG.get("database")
+    if not dbname:
+        return
+
+    try:
+        # try a normal connection first
+        conn = mysql.connector.connect(**DB_CONFIG)
+        conn.close()
+        return
+    except mysql.connector.Error as e:
+        # If database doesn't exist, create it
+        if getattr(e, 'errno', None) == errorcode.ER_BAD_DB_ERROR or 'Unknown database' in str(e):
+            cfg = DB_CONFIG.copy()
+            cfg.pop('database', None)
+            conn = mysql.connector.connect(**cfg)
+            cursor = conn.cursor()
+            try:
+                cursor.execute(f"CREATE DATABASE IF NOT EXISTS `{dbname}` CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci")
+                conn.commit()
+                # import schema file if exists
+                if os.path.exists(schema_path):
+                    with open(schema_path, 'r', encoding='utf-8') as fh:
+                        sql = fh.read()
+                    # split on semicolon and execute statements
+                    statements = [s.strip() for s in sql.split(';') if s.strip()]
+                    for stmt in statements:
+                        try:
+                            cursor.execute(stmt)
+                        except mysql.connector.Error:
+                            # ignore individual statement errors from dump
+                            pass
+                    conn.commit()
+            finally:
+                cursor.close()
+                conn.close()
+        else:
+            # other DB errors -> re-raise
+            raise
 
 
 # ─── Décorateur : utilisateur connecté ────────────────────────────────────────
@@ -58,38 +106,29 @@ def register():
     # ── Hachage du mot de passe ─────────────────────────────────────────────
     hashed = bcrypt.hashpw(mdp.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
 
-<<<<<<< HEAD
     # ── Insertion en base (prepared statement) ─────────────────────────────
+    conn = None
+    cursor = None
     try:
-        conn   = get_db()
+        conn = get_db()
         # prepared=True → MariaDB compile la requête côté serveur avant
         # d'injecter les paramètres : aucune donnée utilisateur ne peut
         # modifier la structure SQL (protection SQLi).
         cursor = conn.cursor(prepared=True)
         cursor.execute(
-            "INSERT INTO users (identifiant, mdp, mail) VALUES (?, ?, ?)",
-            (identifiant, hashed, mail)
+            "INSERT INTO users (identifiant, mdp, mail) VALUES (%s, %s, %s)",
+            (identifiant, hashed, mail),
         )
         conn.commit()
     except mysql.connector.IntegrityError:
-=======
-    # ── Insertion en base ───────────────────────────────────────────────────
-    try:
-        conn   = get_db()
-        cursor = conn.cursor()
-        cursor.execute(
-            "INSERT INTO users (identifiant, mdp, mail) VALUES (%s, %s, %s)",
-            (identifiant, hashed, mail)
-        )
-        conn.commit()
-    except mysql.connector.IntegrityError as e:
->>>>>>> ee4208b3210f27f0abb7ae14e452f7809c1ecdc6
         return jsonify({"success": False, "message": "Identifiant ou email déjà utilisé"}), 409
     except mysql.connector.Error as e:
         return jsonify({"success": False, "message": f"Erreur base de données : {e}"}), 500
     finally:
-        cursor.close()
-        conn.close()
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
 
     return jsonify({"success": True, "message": "Compte créé avec succès"}), 201
 
@@ -110,32 +149,27 @@ def login():
     if not identifiant or not mdp:
         return jsonify({"success": False, "message": "Identifiant et mot de passe requis"}), 400
 
+    conn = None
+    cursor = None
     try:
-        conn   = get_db()
-<<<<<<< HEAD
+        conn = get_db()
         # prepared=True → requête compilée côté serveur, paramètres transmis
         # séparément : l'identifiant saisi ne peut pas altérer le SQL.
         cursor = conn.cursor(prepared=True)
         cursor.execute(
-            "SELECT id_user, mdp FROM users WHERE identifiant = ?",
+            "SELECT id_user, mdp FROM users WHERE identifiant = %s",
             (identifiant,)
         )
         row = cursor.fetchone()
         # cursor(prepared=True) renvoie des tuples ; on reconstruit un dict.
         user = {"id_user": row[0], "mdp": row[1]} if row else None
-=======
-        cursor = conn.cursor(dictionary=True)
-        cursor.execute(
-            "SELECT id_user, mdp FROM users WHERE identifiant = %s",
-            (identifiant,)
-        )
-        user = cursor.fetchone()
->>>>>>> ee4208b3210f27f0abb7ae14e452f7809c1ecdc6
     except mysql.connector.Error as e:
         return jsonify({"success": False, "message": f"Erreur base de données : {e}"}), 500
     finally:
-        cursor.close()
-        conn.close()
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
 
     if user is None or not bcrypt.checkpw(mdp.encode("utf-8"), user["mdp"].encode("utf-8")):
         return jsonify({"success": False, "message": "Identifiant ou mot de passe incorrect"}), 401
@@ -172,4 +206,9 @@ def me():
 
 # ─── Lancement ─────────────────────────────────────────────────────────────────
 if __name__ == "__main__":
+    # Ensure database and schema are present when starting locally
+    try:
+        ensure_database()
+    except Exception as e:
+        print(f"Erreur lors de la préparation de la base de données : {e}")
     app.run(debug=True, port=5000)
