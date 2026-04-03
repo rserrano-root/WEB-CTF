@@ -58,6 +58,7 @@ def register():
     # ── Hachage du mot de passe ─────────────────────────────────────────────
     hashed = bcrypt.hashpw(mdp.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
 
+<<<<<<< HEAD
     # ── Insertion en base (prepared statement) ─────────────────────────────
     try:
         conn   = get_db()
@@ -71,6 +72,18 @@ def register():
         )
         conn.commit()
     except mysql.connector.IntegrityError:
+=======
+    # ── Insertion en base ───────────────────────────────────────────────────
+    try:
+        conn   = get_db()
+        cursor = conn.cursor()
+        cursor.execute(
+            "INSERT INTO users (identifiant, mdp, mail) VALUES (%s, %s, %s)",
+            (identifiant, hashed, mail)
+        )
+        conn.commit()
+    except mysql.connector.IntegrityError as e:
+>>>>>>> ee4208b3210f27f0abb7ae14e452f7809c1ecdc6
         return jsonify({"success": False, "message": "Identifiant ou email déjà utilisé"}), 409
     except mysql.connector.Error as e:
         return jsonify({"success": False, "message": f"Erreur base de données : {e}"}), 500
@@ -99,6 +112,7 @@ def login():
 
     try:
         conn   = get_db()
+<<<<<<< HEAD
         # prepared=True → requête compilée côté serveur, paramètres transmis
         # séparément : l'identifiant saisi ne peut pas altérer le SQL.
         cursor = conn.cursor(prepared=True)
@@ -109,6 +123,14 @@ def login():
         row = cursor.fetchone()
         # cursor(prepared=True) renvoie des tuples ; on reconstruit un dict.
         user = {"id_user": row[0], "mdp": row[1]} if row else None
+=======
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute(
+            "SELECT id_user, mdp FROM users WHERE identifiant = %s",
+            (identifiant,)
+        )
+        user = cursor.fetchone()
+>>>>>>> ee4208b3210f27f0abb7ae14e452f7809c1ecdc6
     except mysql.connector.Error as e:
         return jsonify({"success": False, "message": f"Erreur base de données : {e}"}), 500
     finally:
