@@ -16,10 +16,10 @@
   <a class="nav-logo" href="./documentation.html"><span class="bracket">[</span>NEXUS<span class="bracket">]</span></a>
   <div class="nav-status"><div class="status-dot"></div>AUTHORIZED_SESSION :: ACTIVE</div>
   <div class="nav-links">
-    <a class="nav-btn" href="../LOGIN/LOGIN.html">Login</a>
-    <a class="nav-btn" href="../REGISTER/REGISTER.html">Register</a>
-    <a class="nav-btn active" href="./documentation.html">Docs</a>
-    <button class="logout-btn" type="button" onclick="logout()">Logout</button>
+    <a class="nav-btn" href="/LOGIN/LOGIN.html">Login</a>
+    <a class="nav-btn" href="/REGISTER/REGISTER.html">Register</a>
+    <a class="nav-btn active" href="/DOC/documentation.html">Docs</a>
+    <button class="logout-btn" type="button">Logout</button>
   </div>
 </nav>
 <main class="page-docs">
@@ -104,8 +104,6 @@
     </article>
   </section>
 </main>
-<script>
-function isAuthenticated(){return document.cookie.split('; ').some(i=>i==='nexus_auth=1')}function requireAuth(){if(!isAuthenticated()){window.location.href='../LOGIN/LOGIN.html'}}function logout(){document.cookie='nexus_auth=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; SameSite=Lax';window.location.href='../LOGIN/LOGIN.html'}requireAuth();const particlesContainer=document.getElementById('particles');if(particlesContainer){for(let i=0;i<30;i++){const p=document.createElement('div');p.className='particle';p.style.left=`${Math.random()*100}%`;p.style.animationDuration=`${8+Math.random()*12}s`;p.style.animationDelay=`${Math.random()*8}s`;const size=Math.random()>.7?3:2;p.style.width=`${size}px`;p.style.height=`${size}px`;p.style.opacity=`${.3+Math.random()*.4}`;if(Math.random()>.7)p.style.background='#00ff88';if(Math.random()>.85)p.style.background='#a855f7';particlesContainer.appendChild(p)}}
-</script>
+<script src="./documentation.js"></script>
 </body>
 </html>

@@ -1,4 +1,4 @@
-// Login page script (particles, auth cookie, login handler)
+// Login page script (particles, auth, login handler)
 const particlesContainer = document.getElementById('particles');
 if (particlesContainer) {
   for (let i = 0; i < 30; i++) {
@@ -17,42 +17,52 @@ if (particlesContainer) {
   }
 }
 
-function setAuthState(v) {
-  if (v) {
-    document.cookie = 'nexus_auth=1; path=/; SameSite=Lax';
-  } else {
-    document.cookie = 'nexus_auth=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; SameSite=Lax';
+// Vérification de session existante au chargement — redirige si déjà connecté
+(async () => {
+  try {
+    const r = await fetch('/api/auth/me', { credentials: 'include' });
+    if (r.ok) window.location.href = '../DOC/documentation.html';
+  } catch {
+    // Serveur inaccessible — on reste sur la page de login
   }
-}
+})();
 
-function isAuthenticated() {
-  return document.cookie.split('; ').some((i) => i === 'nexus_auth=1');
-}
-
-if (isAuthenticated()) {
-  window.location.href = '../DOC/documentation.html';
-}
-
-function handleLogin() {
-  const email = document.getElementById('login-email').value.trim();
-  const pass = document.getElementById('login-password').value;
+async function handleLogin() {
+  const email    = document.getElementById('login-email').value.trim();
+  const pass     = document.getElementById('login-password').value;
   const alertBox = document.getElementById('login-alert');
   if (!alertBox) return;
+
   alertBox.classList.remove('show', 'success');
+
   if (!email || !pass) {
     alertBox.textContent = 'ERROR — Champs requis non remplis';
     alertBox.classList.add('show');
     return;
   }
-  if (pass.length < 4) {
-    alertBox.textContent = 'ACCESS DENIED — Identifiants incorrects';
+
+  try {
+    const res = await fetch('/api/auth/login', {
+      method:      'POST',
+      headers:     { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body:        JSON.stringify({ identifiant: email, mdp: pass }),
+    });
+
+    const data = await res.json();
+
+    if (res.ok && data.success) {
+      alertBox.textContent = 'ACCESS GRANTED — Redirection en cours...';
+      alertBox.classList.add('show', 'success');
+      setTimeout(() => (window.location.href = '../DOC/documentation.html'), 700);
+    } else {
+      alertBox.textContent = `ACCESS DENIED — ${data.message || 'Identifiants incorrects'}`;
+      alertBox.classList.add('show');
+    }
+  } catch {
+    alertBox.textContent = 'ERROR — Impossible de contacter le serveur';
     alertBox.classList.add('show');
-    return;
   }
-  alertBox.textContent = 'ACCESS GRANTED — Redirection en cours...';
-  alertBox.classList.add('show', 'success');
-  setAuthState(true);
-  setTimeout(() => (window.location.href = '../DOC/documentation.html'), 700);
 }
 
 // attach listeners

@@ -34,14 +34,16 @@ function updateStrength(val) {
   for (let i = 0; i < score && i < segs.length; i++) segs[i].classList.add('active');
 }
 
-function handleRegister() {
+async function handleRegister() {
   const username = document.getElementById('reg-username').value.trim();
-  const email = document.getElementById('reg-email').value.trim();
-  const pass = document.getElementById('reg-password').value;
-  const terms = document.getElementById('reg-terms').checked;
+  const email    = document.getElementById('reg-email').value.trim();
+  const pass     = document.getElementById('reg-password').value;
+  const terms    = document.getElementById('reg-terms').checked;
   const alertBox = document.getElementById('register-alert');
   if (!alertBox) return;
+
   alertBox.classList.remove('show', 'success');
+
   if (!username || !email || !pass) {
     alertBox.textContent = 'ERROR — Tous les champs sont requis';
     alertBox.classList.add('show');
@@ -58,13 +60,33 @@ function handleRegister() {
     return;
   }
   if (!terms) {
-    alertBox.textContent = 'ERROR — Conditions d’utilisation requises';
+    alertBox.textContent = "ERROR — Conditions d'utilisation requises";
     alertBox.classList.add('show');
     return;
   }
-  alertBox.textContent = 'COMPTE CRÉÉ — Redirection vers la connexion...';
-  alertBox.classList.add('show', 'success');
-  setTimeout(() => (window.location.href = '../LOGIN/LOGIN.html'), 1000);
+
+  try {
+    const res = await fetch('/api/auth/register', {
+      method:      'POST',
+      headers:     { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body:        JSON.stringify({ identifiant: username, mail: email, mdp: pass }),
+    });
+
+    const data = await res.json();
+
+    if (res.status === 201 && data.success) {
+      alertBox.textContent = 'COMPTE CRÉÉ — Redirection vers la connexion...';
+      alertBox.classList.add('show', 'success');
+      setTimeout(() => (window.location.href = '../LOGIN/LOGIN.html'), 1000);
+    } else {
+      alertBox.textContent = `ERROR — ${data.message || "Échec de l'inscription"}`;
+      alertBox.classList.add('show');
+    }
+  } catch {
+    alertBox.textContent = 'ERROR — Impossible de contacter le serveur';
+    alertBox.classList.add('show');
+  }
 }
 
 // attach listeners
